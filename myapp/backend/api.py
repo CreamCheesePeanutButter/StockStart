@@ -23,6 +23,7 @@ def get_users():
     except Exception as e:
         return jsonify({"error": str(e)}), 500
     
+# Handle sign in
 @app.route("/users", methods=["POST"])
 def add_user():
     from flask import request
