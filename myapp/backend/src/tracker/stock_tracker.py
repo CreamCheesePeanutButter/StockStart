@@ -7,6 +7,7 @@ class Stock:
     open_price = 0
     previous_close = 0
     _ticker = ""
+
     
     def __init__(self, ticker):
         self._ticker = ticker
@@ -21,6 +22,8 @@ class Stock:
         self.low_today = data["l"]
         self.open_price = data["o"]
         self.previous_close = data["pc"]
+        self.name = data["name"]
+
 
 class StockTracker:
     _stocks = {}
