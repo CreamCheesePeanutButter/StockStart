@@ -57,7 +57,10 @@ function SearchBar() {
   // Close dropdown when clicking outside the component
   useEffect(() => {
     const handleClickOutside = (e: MouseEvent) => {
-      if (containerRef.current && !containerRef.current.contains(e.target as Node)) {
+      if (
+        containerRef.current &&
+        !containerRef.current.contains(e.target as Node)
+      ) {
         setOpen(false);
       }
     };
@@ -70,7 +73,7 @@ function SearchBar() {
     ? Object.values(allStocks).filter(
         (s) =>
           s.stock_key.toLowerCase().includes(query.toLowerCase()) ||
-          s.name.toLowerCase().includes(query.toLowerCase())
+          s.name.toLowerCase().includes(query.toLowerCase()),
       )
     : [];
 
@@ -86,13 +89,30 @@ function SearchBar() {
       <div className="sb-wrap" ref={containerRef}>
         <div className="sb-input-row">
           <svg className="sb-icon" viewBox="0 0 20 20" fill="none">
-            <circle cx="8.5" cy="8.5" r="5.5" stroke="currentColor" strokeWidth="1.5" />
-            <path d="M13 13l3.5 3.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+            <circle
+              cx="8.5"
+              cy="8.5"
+              r="5.5"
+              stroke="currentColor"
+              strokeWidth="1.5"
+            />
+            <path
+              d="M13 13l3.5 3.5"
+              stroke="currentColor"
+              strokeWidth="1.5"
+              strokeLinecap="round"
+            />
           </svg>
           <input
             className="sb-input"
             type="text"
-            placeholder={loading ? "Loading..." : error ? "Unavailable" : "Search ticker or name..."}
+            placeholder={
+              loading
+                ? "Loading..."
+                : error
+                  ? "Unavailable"
+                  : "Search ticker or name..."
+            }
             value={query}
             disabled={loading || !!error}
             onChange={(e) => {
@@ -102,7 +122,13 @@ function SearchBar() {
             onFocus={() => query.trim() && setOpen(true)}
           />
           {query && (
-            <button className="sb-clear" onClick={() => { setQuery(""); setOpen(false); }}>
+            <button
+              className="sb-clear"
+              onClick={() => {
+                setQuery("");
+                setOpen(false);
+              }}
+            >
               ✕
             </button>
           )}
@@ -124,9 +150,13 @@ function SearchBar() {
                     <span className="sb-result-name">{stock.name}</span>
                   </div>
                   <div className="sb-result-right">
-                    <span className="sb-result-price">{fmt(stock.current_price)}</span>
+                    <span className="sb-result-price">
+                      {fmt(stock.current_price)}
+                    </span>
                     {pct != null && (
-                      <span className={`sb-result-pct ${up ? "sb-up" : "sb-down"}`}>
+                      <span
+                        className={`sb-result-pct ${up ? "sb-up" : "sb-down"}`}
+                      >
                         {up ? "▲" : "▼"} {Math.abs(pct).toFixed(2)}%
                       </span>
                     )}
@@ -146,7 +176,12 @@ function SearchBar() {
       {selected && (
         <div className="sb-modal-backdrop" onClick={() => setSelected(null)}>
           <div className="sb-modal" onClick={(e) => e.stopPropagation()}>
-            <button className="sb-modal-close" onClick={() => setSelected(null)}>✕</button>
+            <button
+              className="sb-modal-close"
+              onClick={() => setSelected(null)}
+            >
+              ✕
+            </button>
 
             <div className="sb-modal-header">
               <span className="sb-modal-ticker">{selected.stock_key}</span>
@@ -154,9 +189,14 @@ function SearchBar() {
             </div>
 
             <div className="sb-modal-price-row">
-              <span className="sb-modal-current">{fmt(selected.current_price)}</span>
+              <span className="sb-modal-current">
+                {fmt(selected.current_price)}
+              </span>
               {(() => {
-                const pct = pctChange(selected.current_price, selected.previous_close);
+                const pct = pctChange(
+                  selected.current_price,
+                  selected.previous_close,
+                );
                 if (pct == null) return null;
                 const up = pct >= 0;
                 return (
@@ -170,55 +210,64 @@ function SearchBar() {
             <div className="sb-modal-grid">
               <div className="sb-modal-stat">
                 <span className="sb-stat-label">OPEN</span>
-                <span className="sb-stat-value">{fmt(selected.open_price)}</span>
+                <span className="sb-stat-value">
+                  {fmt(selected.open_price)}
+                </span>
               </div>
               <div className="sb-modal-stat">
                 <span className="sb-stat-label">PREV CLOSE</span>
-                <span className="sb-stat-value">{fmt(selected.previous_close)}</span>
+                <span className="sb-stat-value">
+                  {fmt(selected.previous_close)}
+                </span>
               </div>
               <div className="sb-modal-stat">
                 <span className="sb-stat-label">HIGH</span>
-                <span className="sb-stat-value sb-up">{fmt(selected.high_today)}</span>
+                <span className="sb-stat-value sb-up">
+                  {fmt(selected.high_today)}
+                </span>
               </div>
               <div className="sb-modal-stat">
                 <span className="sb-stat-label">LOW</span>
-                <span className="sb-stat-value sb-down">{fmt(selected.low_today)}</span>
+                <span className="sb-stat-value sb-down">
+                  {fmt(selected.low_today)}
+                </span>
               </div>
             </div>
 
             {/* Day range bar */}
-            {selected.low_today > 0 && selected.high_today > selected.low_today && (
-              <div className="sb-range-wrap">
-                <span className="sb-range-label">Day range</span>
-                <div className="sb-range-bar">
-                  <div
-                    className="sb-range-fill"
-                    style={{
-                      left: "0%",
-                      width: `${
-                        ((selected.current_price - selected.low_today) /
-                          (selected.high_today - selected.low_today)) *
-                        100
-                      }%`,
-                    }}
-                  />
-                  <div
-                    className="sb-range-dot"
-                    style={{
-                      left: `${
-                        ((selected.current_price - selected.low_today) /
-                          (selected.high_today - selected.low_today)) *
-                        100
-                      }%`,
-                    }}
-                  />
+            {selected.low_today > 0 &&
+              selected.high_today > selected.low_today && (
+                <div className="sb-range-wrap">
+                  <span className="sb-range-label">Day range</span>
+                  <div className="sb-range-bar">
+                    <div
+                      className="sb-range-fill"
+                      style={{
+                        left: "0%",
+                        width: `${
+                          ((selected.current_price - selected.low_today) /
+                            (selected.high_today - selected.low_today)) *
+                          100
+                        }%`,
+                      }}
+                    />
+                    <div
+                      className="sb-range-dot"
+                      style={{
+                        left: `${
+                          ((selected.current_price - selected.low_today) /
+                            (selected.high_today - selected.low_today)) *
+                          100
+                        }%`,
+                      }}
+                    />
+                  </div>
+                  <div className="sb-range-ends">
+                    <span>{fmt(selected.low_today)}</span>
+                    <span>{fmt(selected.high_today)}</span>
+                  </div>
                 </div>
-                <div className="sb-range-ends">
-                  <span>{fmt(selected.low_today)}</span>
-                  <span>{fmt(selected.high_today)}</span>
-                </div>
-              </div>
-            )}
+              )}
           </div>
         </div>
       )}

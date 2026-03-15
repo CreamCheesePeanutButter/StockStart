@@ -22,3 +22,6 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+# exclude test.ipynb from git tracking
+test.ipynb
