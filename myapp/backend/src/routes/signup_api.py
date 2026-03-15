@@ -43,4 +43,4 @@ class SignupAPI(MethodView):
 
 
 signup_view = SignupAPI.as_view('signup_api')
-signup_bp.add_url_rule('/register', view_func=signup_view, methods=['POST'])
+signup_bp.add_url_rule('/signup', view_func=signup_view, methods=['POST'])

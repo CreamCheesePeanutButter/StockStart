@@ -11,6 +11,9 @@ from tracker.stock_tracker import StockTracker
 # The blueprint now is stock_api
 stock_bp = Blueprint('stock_api', __name__)
 
+
+
+
 class StockAPI(MethodView):
     # We need GET API for allowing the frontend to get the stock data
     stock_tracker = StockTracker()
@@ -36,18 +39,23 @@ class StockAPI(MethodView):
                         low_price = VALUES(low_price),
                         open_price = VALUES(open_price),
                         previous_close = VALUES(previous_close)
+                        name = VALUES(name)
                     """,
-                    (ticker, stock.current_price, stock.high_today, stock.low_today, stock.open_price, stock.previous_close)
+                    (ticker, stock.current_price, stock.high_today, stock.low_today, stock.open_price, stock.previous_close, stock.name)
                 )
             db.commit()
+            cursor.execute("Selec")
             cursor.close()
         return jsonify({
-            "stocks": {ticker: {
-                "current_price": stock.current_price,
-                "high_today": stock.high_today,
-                "low_today": stock.low_today,
-                "open_price": stock.open_price,
-                "previous_close": stock.previous_close
+            "stocks": {
+                ticker: {
+                    "stock_key" : ticker,
+                    "name" :  stock.name,        
+                    "current_price": stock.current_price,
+                    "high_today": stock.high_today,
+                    "low_today": stock.low_today,
+                    "open_price": stock.open_price,
+                    "previous_close": stock.previous_close
             } for ticker, stock in self.stock_tracker.stocks.items()}
         })   
 
