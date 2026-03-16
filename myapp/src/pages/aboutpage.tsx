@@ -6,14 +6,17 @@ function AboutPage() {
       <div className="bg-grid" />
       <div className="about-content">
         <h1 className="about-title">About TradeStart</h1>
-        <p className="about-subtitle">
-          A real-time stock trading platform.
-        </p>
+        <p className="about-subtitle">A real-time stock trading platform.</p>
 
         <div className="about-section">
           <h2 className="about-section-title">What is TradeStart?</h2>
           <p className="about-body">
-            TradeStart is a ...
+            TradeStart is a full-stack web application that provides users with
+            real-time stock market data and a simulated trading environment for
+            educational purposes . It allows users to view live stock prices,
+            track their portfolio, and execute virtual trades using real market
+            data. The platform is designed for both beginner and experienced
+            traders to practice their strategies without risking real money.
           </p>
         </div>
 
