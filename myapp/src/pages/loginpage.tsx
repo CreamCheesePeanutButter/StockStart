@@ -1,9 +1,17 @@
 import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { useAuth } from "../context/AuthContext";
 import "./loginpage.css";
 
+const API_URL = import.meta.env.VITE_API_URL ?? "http://127.0.0.1:5000";
+
 function LoginPage() {
+  const navigate = useNavigate();
+  const { login } = useAuth();
+
   const [isLogin, setIsLogin] = useState(true);
-  const [email, setEmail] = useState("");
+  const [identifier, setIdentifier] = useState(""); // email or username for login
+  const [email, setEmail] = useState("");            // email for signup
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [firstName, setFirstName] = useState("");
@@ -11,7 +19,6 @@ function LoginPage() {
   const [username, setUsername] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
-  const [successMessage, setSuccessMessage] = useState("");
   const [isLoading, setIsLoading] = useState(false);
 
   const validateEmail = (value: string) => {
@@ -19,34 +26,35 @@ function LoginPage() {
   };
 
   const handleLogin = async () => {
-    if (!email || !password) {
-      setErrorMessage("Email and password are required.");
-      return;
-    }
-    if (!validateEmail(email)) {
-      setErrorMessage("Enter a valid email address.");
+    if (!identifier || !password) {
+      setErrorMessage("Email/username and password are required.");
       return;
     }
 
     setIsLoading(true);
     setErrorMessage("");
-    setSuccessMessage("");
 
-    const response = await fetch("http://127.0.0.1:5000/login", {
+    const response = await fetch(`${API_URL}/login`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ email, password }),
+      body: JSON.stringify({ identifier, password }),
     });
 
     const data = await response.json();
     setIsLoading(false);
 
     if (response.ok) {
-      setSuccessMessage("Signed in successfully.");
+      login({
+        id: data.user.userID,
+        username: data.user.username,
+        email: data.user.email,
+        balance: data.user.available_funds,
+      });
+      navigate("/", { replace: true });
     } else if (response.status === 400) {
-      setErrorMessage("Email and password are required.");
+      setErrorMessage("Email/username and password are required.");
     } else if (response.status === 401) {
-      setErrorMessage("Incorrect email or password.");
+      setErrorMessage("Incorrect email/username or password.");
     } else {
       setErrorMessage(data.message || "Something went wrong.");
     }
@@ -72,9 +80,8 @@ function LoginPage() {
 
     setIsLoading(true);
     setErrorMessage("");
-    setSuccessMessage("");
 
-    const response = await fetch("http://127.0.0.1:5000/signup", {
+    const response = await fetch(`${API_URL}/signup`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ email, password, first_name: firstName, last_name: lastName, username }),
@@ -84,14 +91,9 @@ function LoginPage() {
     setIsLoading(false);
 
     if (response.ok) {
-      setSuccessMessage("Account created. You can now sign in.");
-      setIsLogin(true);
-      setEmail("");
-      setPassword("");
-      setConfirmPassword("");
-      setFirstName("");
-      setLastName("");
-      setUsername("");
+      navigate("/setup-funds", { state: { userId: data.user_id } });
+    } else if (response.status === 409) {
+      setErrorMessage("An account with that email already exists.");
     } else if (response.status === 400) {
       setErrorMessage("Email already in use or invalid data.");
     } else {
@@ -111,7 +113,7 @@ function LoginPage() {
   const switchMode = (toLogin: boolean) => {
     setIsLogin(toLogin);
     setErrorMessage("");
-    setSuccessMessage("");
+    setIdentifier("");
     setEmail("");
     setPassword("");
     setConfirmPassword("");
@@ -129,16 +131,11 @@ function LoginPage() {
       <div className="card">
         <div className="brand-row">
           <div className="xbox-icon">
-            <svg
-              viewBox="0 0 40 40"
-              fill="none"
-              xmlns="http://www.w3.org/2000/svg"
-            >
+            <svg viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
               <circle cx="20" cy="20" r="19" stroke="#107C10" strokeWidth="2" />
               <path
                 d="M10 14c2-3 5-5 10-5s8 2 10 5c-2 3-5 8-10 11C15 22 12 17 10 14z"
-                fill="#107C10"
-                opacity="0.3"
+                fill="#107C10" opacity="0.3"
               />
               <path
                 d="M13 28c-2-2-3-5-3-8 0-2 0-4 1-6 1 2 4 7 9 10-2 2-5 4-7 4z"
@@ -213,14 +210,14 @@ function LoginPage() {
           )}
 
           <div className="field-group">
-            <label className="field-label">EMAIL</label>
+            <label className="field-label">{isLogin ? "EMAIL OR USERNAME" : "EMAIL"}</label>
             <input
               className="text-input"
-              type="email"
-              placeholder="you@example.com"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              autoComplete="email"
+              type="text"
+              placeholder={isLogin ? "you@example.com or johndoe" : "you@example.com"}
+              value={isLogin ? identifier : email}
+              onChange={(e) => isLogin ? setIdentifier(e.target.value) : setEmail(e.target.value)}
+              autoComplete={isLogin ? "username" : "email"}
             />
           </div>
 
@@ -242,23 +239,13 @@ function LoginPage() {
                 tabIndex={-1}
               >
                 {showPassword ? (
-                  <svg
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="2"
-                  >
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                     <path d="M17.94 17.94A10.07 10.07 0 0112 20c-7 0-11-8-11-8a18.45 18.45 0 015.06-5.94" />
                     <path d="M9.9 4.24A9.12 9.12 0 0112 4c7 0 11 8 11 8a18.5 18.5 0 01-2.16 3.19" />
                     <line x1="1" y1="1" x2="23" y2="23" />
                   </svg>
                 ) : (
-                  <svg
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="2"
-                  >
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                     <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
                     <circle cx="12" cy="12" r="3" />
                   </svg>
@@ -282,9 +269,6 @@ function LoginPage() {
           )}
 
           {errorMessage && <div className="msg msg-error">{errorMessage}</div>}
-          {successMessage && (
-            <div className="msg msg-success">{successMessage}</div>
-          )}
 
           <button type="submit" className="submit-btn" disabled={isLoading}>
             {isLoading ? (
