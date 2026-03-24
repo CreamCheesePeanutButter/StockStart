@@ -55,6 +55,14 @@
   color: #666;
 }
 
+.profile-balance {
+  margin-top: 10px;
+  font-size: 14px;
+  font-weight: 600;
+  color: #52B043;
+  letter-spacing: 0.06em;
+}
+
 .profile-bottom {
   display: flex;
   flex-direction: column;
@@ -80,7 +88,7 @@
 .profile-bottom button:hover {
   border-color: rgba(84, 12, 1, 0.25);
   box-shadow: 0 0 12px rgba(16, 124, 16, 0.25);
-  color: #2a2a2a;
+  color: #f0f0f0;
 }
 
 .profile-bottom-logout {

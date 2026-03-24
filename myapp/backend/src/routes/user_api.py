@@ -143,7 +143,7 @@ class BuyAPI(MethodView):
         if not stock:
             return jsonify({"message": "Stock not found"}), 404
 
-        price = stock["current_price"]
+        price = float(stock["current_price"])
 
         user = User.from_dict(user_data)
 
@@ -193,7 +193,7 @@ class SellAPI(MethodView):
         if not stock:
             return jsonify({"message": "Stock not found"}), 404
 
-        price = stock["current_price"]
+        price = float(stock["current_price"])
 
         user = User.from_dict(user_data)
 
@@ -221,4 +221,95 @@ user_bp.add_url_rule(
     "/user/<int:user_id>/sell",
     view_func=sell_view,
     methods=["POST"]
+)
+
+###########################Portfolio API
+
+class PortfolioAPI(MethodView):
+
+    def get(self, user_id):
+        db = get_db()
+        cursor = db.cursor(dictionary=True)
+
+        cursor.execute(
+            """
+            SELECT
+                t.stock_symbol,
+                s.name,
+                SUM(t.number_of_shares) AS total_shares,
+                SUM(CASE WHEN t.transaction_type = 'BUY' THEN t.number_of_shares * t.price ELSE 0 END) /
+                    NULLIF(SUM(CASE WHEN t.transaction_type = 'BUY' THEN t.number_of_shares ELSE 0 END), 0) AS avg_price,
+                s.current_price
+            FROM TradeTable t
+            LEFT JOIN stock s ON t.stock_symbol = s.stock_key
+            WHERE t.userID = %s
+            GROUP BY t.stock_symbol, s.name, s.current_price
+            HAVING total_shares > 0
+            """,
+            (user_id,)
+        )
+
+        holdings = cursor.fetchall()
+        cursor.close()
+
+        return jsonify({
+            "portfolio": [
+                {
+                    "symbol": h["stock_symbol"],
+                    "companyName": h["name"] or h["stock_symbol"],
+                    "shares": int(h["total_shares"]),
+                    "avgPrice": float(h["avg_price"] or 0),
+                    "currentPrice": float(h["current_price"] or 0),
+                }
+                for h in holdings
+            ]
+        }), 200
+
+portfolio_view = PortfolioAPI.as_view("portfolio_api")
+user_bp.add_url_rule(
+    "/user/<int:user_id>/portfolio",
+    view_func=portfolio_view,
+    methods=["GET"]
+)
+
+###########################Trade History API
+
+class TradeHistoryAPI(MethodView):
+
+    def get(self, user_id):
+        db = get_db()
+        cursor = db.cursor(dictionary=True)
+
+        cursor.execute(
+            """
+            SELECT stock_symbol, number_of_shares, price, transaction_date, transaction_type
+            FROM TradeTable
+            WHERE userID = %s
+            ORDER BY transaction_date DESC
+            """,
+            (user_id,)
+        )
+
+        rows = cursor.fetchall()
+        cursor.close()
+
+        return jsonify({
+            "history": [
+                {
+                    "symbol": r["stock_symbol"],
+                    "shares": abs(int(r["number_of_shares"])),
+                    "price": float(r["price"]),
+                    "total": float(r["price"]) * abs(int(r["number_of_shares"])),
+                    "type": r["transaction_type"],
+                    "date": r["transaction_date"].strftime("%Y-%m-%d %H:%M"),
+                }
+                for r in rows
+            ]
+        }), 200
+
+history_view = TradeHistoryAPI.as_view("trade_history_api")
+user_bp.add_url_rule(
+    "/user/<int:user_id>/history",
+    view_func=history_view,
+    methods=["GET"]
 )
