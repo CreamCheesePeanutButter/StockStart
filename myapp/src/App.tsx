@@ -6,6 +6,7 @@ import {
 } from "react-router-dom";
 
 import { AuthProvider } from "./context/AuthContext";
+import { RefreshProvider } from "./context/RefreshContext";
 import RootLayout from "./layout/rootlayout";
 import Homepage from "./pages/homepage.tsx";
 import LoginPage from "./pages/loginpage.tsx";
@@ -28,7 +29,9 @@ function App() {
 
   return (
     <AuthProvider>
-      <RouterProvider router={router} />
+      <RefreshProvider>
+        <RouterProvider router={router} />
+      </RefreshProvider>
     </AuthProvider>
   );
 }
