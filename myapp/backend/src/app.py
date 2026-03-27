@@ -17,12 +17,11 @@ def create_app():
     app.config["MYSQL_PASSWORD"] = const.PASSWORD
     app.config["MYSQL_DB"] = const.DATABASE
 
+
     app.register_blueprint(login_bp)
     app.register_blueprint(stock_bp)
     app.register_blueprint(signup_bp)
     app.register_blueprint(funds_bp)
-
-    app.teardown_appcontext(close_db)
 
     return app
 
@@ -30,4 +29,5 @@ def create_app():
 # run normally
 if __name__ == "__main__":
     app = create_app()
+    app.secret_key = "test"
     app.run(debug=True)
