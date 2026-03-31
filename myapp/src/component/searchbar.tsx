@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from "react";
 import "./searchbar.css";
 import { useAuth } from "../context/AuthContext";
 import { useRefresh } from "../context/RefreshContext";
+///////////////////////////READ THIS CODE PLEASE!///////////////////////////
 import { LineChart } from "@mui/x-charts/LineChart";
 
 const API_URL = import.meta.env.VITE_API_URL ?? "http://127.0.0.1:5000";
@@ -228,7 +229,9 @@ function SearchBar() {
         )}
       </div>
 
-      {/* Full stock detail modal */}
+      {/* 
+      PLEASE READ THIS COMMENT BEFORE YOU SCROLL PAST THIS CODE!
+      This code is sucks You supposed to make another file foe the stock page not just doing it in 1 file!!!!!!!! */}
       {selected && (
         <div className="sb-modal-backdrop" onClick={() => setSelected(null)}>
           <div className="sb-modal" onClick={(e) => e.stopPropagation()}>
