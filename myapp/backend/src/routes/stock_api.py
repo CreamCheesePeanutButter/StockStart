@@ -95,3 +95,16 @@ class StockExchangeCurrencyAPI(MethodView):
         }), 200
     
 stock_bp.add_url_rule('/stocks/exchange', view_func=StockExchangeCurrencyAPI.as_view('stock_exchange'), methods=['POST'])
+
+class StockHistoryAPI(MethodView):
+    def get (self, ticker):
+        history = _tracker.get_stock_history(ticker)
+        if history is not None:
+            return jsonify({
+                "stock_key": ticker,
+                "history": history
+            }), 200
+        else:
+            return jsonify({"error": "Stock not found"}), 404
+
+stock_bp.add_url_rule('/stocks/<string:ticker>/history', view_func=StockHistoryAPI.as_view('stock_history'), methods=['GET'])

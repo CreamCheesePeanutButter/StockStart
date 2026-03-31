@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from "react";
 import "./searchbar.css";
 import { useAuth } from "../context/AuthContext";
 import { useRefresh } from "../context/RefreshContext";
+import { LineChart } from "@mui/x-charts/LineChart";
 
 const API_URL = import.meta.env.VITE_API_URL ?? "http://127.0.0.1:5000";
 
@@ -41,7 +42,9 @@ function SearchBar() {
   const [tradeShares, setTradeShares] = useState("");
   const [tradeLoading, setTradeLoading] = useState(false);
   const [tradeMsg, setTradeMsg] = useState<string | null>(null);
-  const [tradeMsgType, setTradeMsgType] = useState<"success" | "error">("success");
+  const [tradeMsgType, setTradeMsgType] = useState<"success" | "error">(
+    "success",
+  );
 
   const containerRef = useRef<HTMLDivElement>(null);
 
@@ -115,7 +118,9 @@ function SearchBar() {
         setTradeMsgType("error");
       } else {
         const price = (data as any).price;
-        setTradeMsg(`Bought ${qty} share${qty > 1 ? "s" : ""}${price != null ? ` at ${fmt(price)}` : ""}`);
+        setTradeMsg(
+          `Bought ${qty} share${qty > 1 ? "s" : ""}${price != null ? ` at ${fmt(price)}` : ""}`,
+        );
         setTradeMsgType("success");
         setTradeShares("");
         triggerRefresh();
@@ -233,7 +238,20 @@ function SearchBar() {
             >
               ✕
             </button>
-
+            <LineChart
+              width={400}
+              height={100}
+              series={[
+                {
+                  data: [1, 2, 3, 4, 5],
+                },
+              ]}
+              xAxis={[
+                {
+                  data: [1, 2, 3, 4, 5],
+                },
+              ]}
+            />
             <div className="sb-modal-header">
               <span className="sb-modal-ticker">{selected.stock_key}</span>
               <span className="sb-modal-name">{selected.name}</span>
@@ -346,12 +364,13 @@ function SearchBar() {
                 <p className="sb-trade-msg sb-trade-info">Log in to trade</p>
               )}
               {tradeMsg && (
-                <p className={`sb-trade-msg ${tradeMsgType === "error" ? "sb-trade-error" : "sb-trade-success"}`}>
+                <p
+                  className={`sb-trade-msg ${tradeMsgType === "error" ? "sb-trade-error" : "sb-trade-success"}`}
+                >
                   {tradeMsg}
                 </p>
               )}
             </div>
-
           </div>
         </div>
       )}
