@@ -2,6 +2,9 @@ import React, { useState, useEffect, useRef } from "react";
 import "./searchbar.css";
 import { useAuth } from "../context/AuthContext";
 import { useRefresh } from "../context/RefreshContext";
+///////////////////////////READ THIS CODE PLEASE!///////////////////////////
+import { LineChart } from "@mui/x-charts/LineChart";
+import StockChart from "./stockchart";
 
 const API_URL = import.meta.env.VITE_API_URL ?? "http://127.0.0.1:5000";
 
@@ -14,6 +17,23 @@ interface StockData {
   low_today: number;
   open_price: number;
   previous_close: number;
+  // Example of stock history data returned by GET /stocks/:stock_key/history
+  // {
+  //   "Date": "2026-03-04",
+  //   "Open": 258.63,
+  //   "High": 258.77,
+  //   "Low": 254.37,
+  //   "Close": 257.46,
+  //   "Volume": 41120000
+  // }
+
+  stock_history?: {
+    date: string;
+    open: number;
+    high: number;
+    low: number;
+    close: number;
+  };
 }
 
 const fmt = (val: number | undefined) =>
@@ -41,7 +61,9 @@ function SearchBar() {
   const [tradeShares, setTradeShares] = useState("");
   const [tradeLoading, setTradeLoading] = useState(false);
   const [tradeMsg, setTradeMsg] = useState<string | null>(null);
-  const [tradeMsgType, setTradeMsgType] = useState<"success" | "error">("success");
+  const [tradeMsgType, setTradeMsgType] = useState<"success" | "error">(
+    "success",
+  );
 
   const containerRef = useRef<HTMLDivElement>(null);
 
@@ -115,7 +137,9 @@ function SearchBar() {
         setTradeMsgType("error");
       } else {
         const price = (data as any).price;
-        setTradeMsg(`Bought ${qty} share${qty > 1 ? "s" : ""}${price != null ? ` at ${fmt(price)}` : ""}`);
+        setTradeMsg(
+          `Bought ${qty} share${qty > 1 ? "s" : ""}${price != null ? ` at ${fmt(price)}` : ""}`,
+        );
         setTradeMsgType("success");
         setTradeShares("");
         triggerRefresh();
@@ -223,7 +247,9 @@ function SearchBar() {
         )}
       </div>
 
-      {/* Full stock detail modal */}
+      {/* 
+      PLEASE READ THIS COMMENT BEFORE YOU SCROLL PAST THIS CODE!
+      This code is sucks You supposed to make another file foe the stock page not just doing it in 1 file!!!!!!!! */}
       {selected && (
         <div className="sb-modal-backdrop" onClick={() => setSelected(null)}>
           <div className="sb-modal" onClick={(e) => e.stopPropagation()}>
@@ -258,6 +284,8 @@ function SearchBar() {
               })()}
             </div>
 
+            <StockChart ticker={selected.stock_key} />
+
             <div className="sb-modal-grid">
               <div className="sb-modal-stat">
                 <span className="sb-stat-label">OPEN</span>
@@ -284,7 +312,6 @@ function SearchBar() {
                 </span>
               </div>
             </div>
-
             {/* Day range bar */}
             {selected.low_today > 0 &&
               selected.high_today > selected.low_today && (
@@ -346,12 +373,13 @@ function SearchBar() {
                 <p className="sb-trade-msg sb-trade-info">Log in to trade</p>
               )}
               {tradeMsg && (
-                <p className={`sb-trade-msg ${tradeMsgType === "error" ? "sb-trade-error" : "sb-trade-success"}`}>
+                <p
+                  className={`sb-trade-msg ${tradeMsgType === "error" ? "sb-trade-error" : "sb-trade-success"}`}
+                >
                   {tradeMsg}
                 </p>
               )}
             </div>
-
           </div>
         </div>
       )}

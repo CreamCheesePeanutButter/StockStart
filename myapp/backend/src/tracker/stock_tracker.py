@@ -1,6 +1,7 @@
-from const.const import API_KEY
+from const.const import API_KEY, STOCK_HISTORY_API_KEY
 import requests
-
+import json
+import yfinance as yf
 class Stock:
     current_price = 0
     high_today = 0
@@ -10,11 +11,7 @@ class Stock:
     _ticker = ""
     name = ""
     currency = "USD"
-    
-    def __init__(self, ticker):
-        self._ticker = ticker
-        self.update()
-
+    _history = {}
 
     def update_name(self):
         url = f"https://finnhub.io/api/v1/stock/profile2?symbol={self._ticker}&token={API_KEY}"
@@ -22,6 +19,32 @@ class Stock:
         data = response.json()
         self.name = data.get("name", self._ticker)
 
+    # get stock history
+    # type here is the stock history in months or in years (MONTH, YEAR)
+    # for now the type is not exist yet
+    def get_stock_history(self):
+
+        data = yf.download(self._ticker, period="1mo", interval="1d")
+
+        data.columns = [col[0] for col in data.columns]
+        data = data.reset_index()
+        #remove timezone info from Date column
+        data["Date"] = data["Date"].astype(str)
+        data["Date"] = data["Date"].str.replace("T00:00:00Z", "")
+
+        history = []
+
+        for _, row in data.iterrows():
+            history.append({
+                "date": str(row["Date"]),
+                "open": float(row["Open"]),
+                "high": float(row["High"]),
+                "low": float(row["Low"]),
+                "close": float(row["Close"])
+            })
+
+        return history
+    
     def update(self):
         url = f"https://finnhub.io/api/v1/quote?symbol={self._ticker}&token={API_KEY}"
         response = requests.get(url)
@@ -36,6 +59,13 @@ class Stock:
             self.exchange_to_currency()
         else:
             self.currency = "USD"
+    #get set 
+    def get_key(self):
+        return self._ticker
+    
+    def __init__(self, ticker):
+        self._ticker = ticker
+        self.update()
 
 
 class StockTracker:
@@ -77,7 +107,9 @@ class StockTracker:
             stock.currency = currency
 
         self._currency = currency
-        
+    def get_stock_history(self, key):
+        return self._stocks[key].get_stock_history()
+    
 
 
             

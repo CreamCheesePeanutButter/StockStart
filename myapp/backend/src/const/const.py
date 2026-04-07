@@ -8,4 +8,4 @@ DATABASE = "creamcheesepeanutbutter_users"
 # Those Data below is for stock API
 API_KEY = "d6njh61r01qodk603pdgd6njh61r01qodk603pe0"
 
-
+STOCK_HISTORY_API_KEY = "EGRDE7SMMHG8OZ7L"
