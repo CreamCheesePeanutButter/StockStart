@@ -1,72 +1,170 @@
-# CSCI2040-Lab-Repo
+# 🚀 CSCI2040 Lab Repo
 
-### How to set up the app
+A full-stack stock trading application with a React frontend and Flask backend.
 
-First you need to have python3 and Node.js installed in your computer
+---
 
-After make sure you have these application then navigate to myapp folder
+# 📦 Prerequisites
 
-```.ps1
+Choose **ONE** setup method:
+
+### 🟢 Option 1 (Recommended): Docker
+
+* Install Docker Desktop
+
+### 🟡 Option 2: Manual Setup
+
+* Install:
+
+  * Node.js
+  * Python (3.x)
+
+---
+
+# 🐳 Run with Docker (Easiest)
+
+### 1. Navigate to project
+
+```
 cd myapp
 ```
 
-1. Set up the front-end
+### 2. Start the app
+
+```
+docker-compose up --build
+```
+
+### 3. Open in browser
+
+```
+http://localhost:5173
+```
+
+### 4. Stop the app
+
+```
+CTRL + C
+```
+
+---
+
+# 💻 Run Manually (Development Mode)
+
+## 1. Navigate to project
+
+```
+cd myapp
+```
+
+---
+
+## 2. Setup Frontend
 
 ```
 npm install
 ```
 
-2. Set up the back-end
+---
 
-- For Window user
+## 3. Setup Backend
+
+### Windows:
 
 ```
 npm run setup-backend
 ```
 
-- For MacOS user
+### Mac/Linux:
 
 ```
 npm run setup-backend-mac
 ```
 
-### How to run the app
+---
 
-To run the project you will need to run the backend server and the front end.
+## 4. Run the App
 
-As I have already set up the script for you to run them:
-First navigate to myapp folder
+### Start Frontend
 
-```.ps1
-cd myapp
 ```
-
-To run the front-end server
-
-```.ps1
 npm run dev
 ```
 
-To run the back-end server
+### Start Backend
 
-- For Window user:
+#### Windows:
 
-```.ps1
-# to run back-end server
+```
 npm run start-backend
 ```
 
-- For MacOS user:
+#### Mac/Linux:
 
-```.sh
+```
 npm run start-backend-unix
 ```
 
-### How to clean all the pycached (not updated for Mac user)
+---
 
-- For Window user:
+# 🧹 Cleanup (Windows Only)
 
-```.ps1
+```
 npm run clean
 ```
 
+---
+
+# 🛠 Troubleshooting
+
+### 🔁 Rebuild Docker
+
+```
+docker-compose down
+docker-compose up --build
+```
+
+---
+
+### ❌ API not working?
+
+* Ensure backend is running
+* If using Docker, verify API URL is:
+
+```
+http://backend:5000
+```
+
+---
+
+### ❌ Port already in use?
+
+Close other apps using:
+
+* `5000` (backend)
+* `5173` (frontend)
+
+---
+
+# 📁 Project Structure
+
+```
+myapp/
+  backend/        # Flask API
+  src/            # React frontend
+  docker-compose.yml
+```
+
+---
+
+# 💡 Notes
+
+* Docker setup is recommended for easiest use
+* Manual setup is better for development/debugging
+* Environment variables may be required for API configuration
+
+---
+
+# 👨‍💻 Authors
+
+PYMAB Team
