@@ -1,4 +1,4 @@
-# 🚀 CSCI2040 Lab Repo
+# 🚀 TradeStart
 
 A full-stack stock trading application with a React frontend and Flask backend.
 
